@@ -26,6 +26,10 @@ Plus two operational choices that make it survivable long-term:
 - **Runtime-portable.** `AGENTS.md` is the canonical instruction file (read by most agent runtimes). `CLAUDE.md` is a thin overlay. Nothing important is locked to one vendor.
 - **Concurrency-safe via git worktrees.** Multiple agent sessions never write the same tree at once; each works in its own worktree and *lands* to `main` with a fast-forward-only merge (see the `land` skill). `log.md` uses `merge=union` so it never conflicts.
 
+And the point of all of it:
+
+6. **It protects you from yourself.** The highest-value thing a second brain does isn't recall — it's **intervention**. A KB that has watched you over time learns your recurring patterns, including your failure modes, and pushes back when you're about to act against your own interest: quit the thing you'd regret quitting, bail under stress, abandon a plan the moment it gets uncomfortable. When you signal one of your patterns, the agent is meant to *name it, cite your own track record, and be direct* — then let you decide with the long view in front of you. Filing is the visible half; this is why it's worth keeping. (See `AGENTS.md` → "The KB as a protector.")
+
 If you believe the near future is **persistent agents that act as long-lived coworkers**, the hard part isn't the model — it's the memory substrate the agent reads and writes. This repo is a working version of that substrate, small enough to understand in an afternoon.
 
 ---
