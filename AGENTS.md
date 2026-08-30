@@ -179,6 +179,13 @@ appointment of the year **on the morning it happens**. That is not a reminder.
 
 See `templates/digest-pins.md` and `templates/digest-daily.md`.
 
+**The runner itself is `templates/nightly-digest.sh`** — a skeleton, not a drop-in. It carries the control
+flow (throwaway worktree, model/effort pinned *before* the auth probe, quoted heredoc with explicit
+`@@PLACEHOLDER@@` interpolation and an abort guard, the hard delivery checkpoint, then
+model-digest → deterministic fallback → failure notice). **The prompt body is deliberately empty.**
+What a digest should contain is specific to a person, and publishing someone else's spec would be
+the least useful part of the file.
+
 - **Pins are one-shot.** They exist because a scheduled run writes up only what it processed that
   run — anything ingested interactively has no route into a digest otherwise, and is silently lost.
 - **Daily items recur** until their recorded state says stop. Give them a hard line cap: a recurring
