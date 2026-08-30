@@ -123,3 +123,72 @@ So this KB is not a passive archive. It is expected to **intervene**. Concretely
 - **Distinguish a pattern-driven impulse from a real decision.** The goal is not to override the human — sometimes quitting is right. The goal is to make sure the choice is made with their own history in view, not made *by* the impulse. Surface, don't dictate.
 
 This is what turns a knowledge base into a second brain: it holds the long view of who the person is when they're at their best, and hands it back to them exactly when the short-term impulse is loudest.
+
+## Transcribing audio and video
+
+The ASR gap is closeable locally, with no API spend.
+
+```bash
+./scripts/transcribe.py <media file> [-o out.txt] [-m small|large-v3-turbo|large-v3] [-l en]
+```
+
+- Backend: **faster-whisper** in a dedicated uv venv kept **outside the repo** (nothing to commit).
+- **`small` is the sensible default** — roughly 9x realtime on an M4, and accurate on clear speech.
+  Reach for `large-v3-turbo` only when the audio is hard or the source is high-stakes.
+- Language auto-detects. Output is timestamped, ready to drop into `raw/`.
+- Setup: `uv venv --python 3.12 ~/.local/share/whisper-env` then
+  `uv pip install --python ~/.local/share/whisper-env/bin/python faster-whisper yt-dlp`
+
+**Pair it with `yt-dlp` and the range of ingestible sources widens a lot.** Podcasts, uploaded video,
+voice notes, screen recordings. **Recorded X Spaces work with no login** — extractor `twitter:spaces`,
+`https://x.com/i/spaces/<id>`. A 2h15m Space is about 90 MB and roughly 15 minutes to transcribe.
+
+## Scheduled runs: guarantee the output
+
+Hard-won, from a scheduled digest that failed **five mornings in a row for five different reasons**
+(credential unavailable, a health probe misreporting the cause, a probe running without the real
+run's flags, a quoting bug that killed the script, and finally a run that exhausted itself before
+reaching the delivery step).
+
+**The lesson is architectural, not a sequence of fixes.** Every individual fix was correct and the
+next morning found a new cause. What worked:
+
+1. **When the same deliverable fails N times with N causes, stop fixing causes and guarantee the
+   output.** Build a degraded-but-present path first — a deterministic, no-model fallback assembled
+   from files on disk. Ugly and never absent beats elegant and sometimes missing.
+2. **Put the deliverable BEFORE the optional work.** A long agent run eats whatever is last. Make
+   the delivery a hard checkpoint partway through, and state in the prompt that a smaller
+   deliverable is a success while an exhaustive run with no deliverable is a failure.
+3. **Never let a scheduled job fail silently.** Every branch either delivers, or delivers a notice
+   that it could not.
+4. **Health checks must use the real run's exact flags.** A probe on a different code path
+   manufactures false diagnoses.
+5. **Build long prompts in a quoted heredoc.** Backticks and `$` inside a double-quoted shell string
+   will execute. `bash -n` does not catch it — test by *building* the prompt, not by linting the file.
+6. **Pin the model and reasoning effort explicitly**, and declare them before any probe uses them.
+
+## Surfacing dated items: look AHEAD, not just at today
+
+A deadline sweep that only surfaces items due **on or before today** will surface the most important
+appointment of the year **on the morning it happens**. That is not a reminder.
+
+**Sweep a horizon — 14 days works — and print a countdown, not a date.** Anything with an `⏰`,
+`DEADLINE`, `expires`, `renews`, `interview`, `book by`.
+
+## Two mechanisms for getting things into a scheduled digest
+
+See `templates/digest-pins.md` and `templates/digest-daily.md`.
+
+- **Pins are one-shot.** They exist because a scheduled run writes up only what it processed that
+  run — anything ingested interactively has no route into a digest otherwise, and is silently lost.
+- **Daily items recur** until their recorded state says stop. Give them a hard line cap: a recurring
+  block that grows the digest has failed.
+
+## Pruning and backups: count what you matched
+
+A backup prune ran nightly for weeks, logged `OK` every time, and had **never once deleted
+anything**. Cause: a glob that matched nothing, in a shell where an unmatched glob expands to
+nothing, over a path containing a space.
+
+**Use `find -print0`, log the number of matches, and treat zero matches as a loud warning rather
+than a quiet success.** A cleanup step that cannot report what it acted on is not observable.
