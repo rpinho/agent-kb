@@ -48,6 +48,9 @@ The routing table is *yours to define* per domain, but the shape is always the s
 | Active decisions / next steps / open items | `wiki/<domain>/Action Plan.md` **and** a line in `state.md` |
 | Distilled lessons / principles | `wiki/<domain>/Learnings.md` |
 | A recurring entity's profile (person, tool, ticker) | `wiki/<domain>/<Entity>.md`, updated over time |
+| A durable fact stated in conversation (measurement, price, date, decision) | the domain page where someone would look for it, as TEXT, in the same turn (never only a commit message, a screenshot, or `log.md`) |
+| A correction to something already filed | fix it at the source page with a dated `Corrected YYYY-MM-DD:` line, then propagate to every file that states the old claim (`scripts/coherence.py --corrections-only` finds stragglers) |
+| A deliverable (digest, report, printable sheet) | `outbox/`; printable hand-over docs go through `scripts/print.sh` |
 
 **Define the routing for each domain up front**, so ingestion is mechanical. A useful mental model for a domain's file set:
 - one page = *the facts / timeline*
@@ -62,16 +65,21 @@ When a source touches multiple domains, the article goes in the **primary** doma
 ## Operations
 
 ### Ingest
-1. Fetch raw content (see the `ingest` skill) → save to `raw/sources/Author - @handle/`.
+1. Fetch raw content (see the `ingest` skill) and save to `raw/sources/Author - @handle/`.
 2. Chase every linked pointer (transcript, article, quoted item) before compiling.
-3. **Compile** into the wiki — integrate into the existing knowledge graph, not a 1:1 summary beside the raw file.
+3. **Compile** into the wiki: integrate into the existing knowledge graph, not a 1:1 summary beside the raw file.
 4. Update `index.md` (source row, file count, tags) and append to `log.md`.
-5. Record in the ledger (`scripts/ledger.py add`) — last.
-6. Update `state.md` if an open loop opened or moved.
-7. Commit.
+5. Update `state.md` if an open loop opened or moved.
+6. Record in the processed ledger (`scripts/ledger.py add`), last of the content steps.
+7. Record in the intraday ledger so the next scheduled digest sees it:
+   `python3 scripts/day-ledger.py add --source <kind> --summary "..." --pages "Page A;Page B" --authors "a,b"`
+   (`--pages`/`--authors` are what the digest lint matches on).
+8. Commit by explicit path, from the session worktree.
 
 ### Query
-Read `index.md` first, then drill into wiki/raw. Verify specific claims against local `raw/`+`wiki/` **before** the web. File good answers back into `wiki/`.
+Read `index.md` first (the session's injected title index lists every page), then drill into wiki/raw. Verify specific claims against local `raw/`+`wiki/` **before** the web. File good answers back into `wiki/`. Never conclude "we don't have X" from a truncated search.
 
 ### Lint (periodic)
-Scan for contradictions, stale claims, orphan pages, missing cross-references, and raw sources never compiled to wiki.
+- `python3 scripts/coherence.py` writes a review queue to `outbox/` (entity joins, unlinked mentions, stale open items, waiting-but-answered items, unpropagated corrections). Nothing is edited automatically.
+- `python3 scripts/state-hygiene.py --candidates FILE` / `--apply DECISIONS` closes open items a newer closed item resolved, after a judgment step.
+- By hand: contradictions, stale claims, orphan pages, raw sources never compiled to wiki.

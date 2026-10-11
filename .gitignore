@@ -23,3 +23,11 @@ __pycache__/
 
 # generated build artifact
 raw/_index/entities.json
+
+# Per-machine / private config (never commit)
+.claude/settings.local.json
+home-links.json
+outbox/.*.log
+
+# Big untracked-by-design folders (originals you drop in for the agent to file)
+inbox/
