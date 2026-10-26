@@ -89,6 +89,20 @@ Decide *"does this belong here at all?"* **before** *"how do I phrase it?"* A kn
 
 If a source mixes keep-able signal with must-not-keep material, extract only the part that belongs and say what you dropped. **When you claim you "sanitized" something, cite the check you actually ran** (e.g. `git diff --cached | grep -iE '<names|figures|domains from the source>'`).
 
+## HARD RULE: Process metadata is a privacy boundary
+
+Another session's prompt may be in its process arguments. **Never print other sessions' full command lines** (`ps aux`, `pgrep -fl`, or a command/args column), or open their transcripts to check liveness. Use PID, parent PID, elapsed time, CPU and executable name; obtain the project directory from a job registry. Pass prompts through stdin or a private input file when the runtime supports it. A status tool must allowlist the fields it prints, rather than try to redact arbitrary arguments.
+
+## HARD RULE: Verify the state you report
+
+Distinguish **launched**, **alive**, **progressing**, **validated** and **delivered**. Before saying a job is running successfully, check a fresh checkpoint or artifact and a meaningful quality control. Before saying it is done, validate the result and account for its child processes and rented resources. Before saying recovery worked, verify the capability the human needed, including phone access when applicable. A PID, exit 0, or "push requested" proves only that particular step.
+
+## Model routing and long jobs
+
+When delegating, give the worker a bounded spec, allowed paths, budget, checkpoint file and acceptance check. Cheap models can route status and execute a settled plan; planning, ambiguous evidence and consequential decisions require a model capable of judging them. Escalate on a named failure or uncertainty, rather than quietly lowering the standard to save tokens.
+
+Long builds run as tracked shell jobs; small scheduler scripts watch for events. Do not keep a large conversation polling a log. Resume from durable state and read the short result first. Model choices, fallback boundaries and resource limits belong in explicit configuration. See [the operations guide](docs/agent-operations.md) for routing, compute and recovery patterns; these are deployment recipes, not additional installed services.
+
 ## Structure
 
 ```
@@ -149,6 +163,7 @@ The main tree is ONE working tree and ONE index: **never run two agents in it at
 1. Always read a file before editing it.
 2. Prefer targeted string replacement; full overwrite only for new files.
 3. **Every deletion must be reversible.** Never delete what the human might want back: a raw source may be the only copy. Prefer the OS trash over `rm`; confirm a verified copy exists elsewhere before removing anything you did not just create. Treat an `inbox/` as a place that may hold the only copy of an original.
+   Before cleanup, check live deployment manifests, configuration, scheduled jobs and symlinks for references to the candidate path. An old date or a name like `review` does not make a folder disposable. Record what moved and how to restore it, then verify the consumers still work.
 4. Commit after every meaningful change, with explicit pathspecs.
 
 ## Git policy

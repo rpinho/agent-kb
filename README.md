@@ -76,6 +76,7 @@ agent-kb/
 ├── CONVENTIONS.md         naming, routing, ingest / query / lint operations
 ├── index.md · log.md · state.md · goals.md
 ├── memory/                MEMORY.md index + one durable fact per file
+├── docs/agent-operations.md  model routing, private process checks, resource guards, session recovery
 ├── raw/                   IMMUTABLE sources (sources/<Author - @handle>/, _index/ = generated metadata)
 ├── wiki/<domain>/         COMPILED knowledge, by topic
 ├── outbox/                deliverables: digests, reports, printable pages
@@ -153,6 +154,22 @@ v1 (July 2026) was the core loop: raw/wiki split, index-first retrieval, the led
 - **A SessionStart title index**, so "we never documented that" is checked against every page title before it is said.
 - **Encrypted backups** that exclude media by default and count what the prune matched.
 - **Docs**: new hard rules in `AGENTS.md` (enforcement hierarchy, capture facts in the same turn, never assert absence from an unverified search, standing permission for routine work); skills split into a short `SKILL.md` plus `references/`; memory conventions for a growing index.
+
+---
+
+## Running it beyond one session
+
+The next set of lessons came from running several agents, long jobs and phone-controlled sessions together. The theme is still **enforce with architecture**, now at the boundary between sessions:
+
+- **Cheap coordination, capable judgment.** Use inexpensive models for bounded execution and status routing; escalate plans, ambiguous results and scientific decisions. Run long builds as shell jobs, with small event-driven watchers, so a large conversation does not keep paying to watch a log.
+- **Process listings are a privacy boundary.** Another agent's prompt can be in its command line. Inspect PIDs, elapsed time and executable names; keep prompts on stdin and never print another session's arguments or logs.
+- **Fallbacks preserve the job contract.** Bound retries, checkpoint progress, record the provider actually used, and verify the artifact after resuming. A specifically requested model must never be silently replaced.
+- **The output and the alarm need separate paths.** Keep the deterministic fallback; run alerts outside the interactive session and verify that a test push reaches the phone. An API accepting a push request is only one step.
+- **Compute needs a lifecycle.** Record ownership and budget before launch, stop idle resources, verify billing stopped, and clean up only the workers the job owns. A low-balance warning is useful; a spending limit is stronger.
+- **A session lane has an identity.** Pin its conversation and project directory, start only missing lanes under a lock, and verify phone discovery as well as process health. Test updates against the behavior you need to preserve.
+- **Research starts with prior art; cleanup starts with live references.** Reproduce the public baseline before improving it, and check deployment/configuration references before moving an apparently stale folder to the trash.
+
+See the [operations guide](docs/agent-operations.md) for the decision tables, checks and rollout order. It distinguishes mechanisms already shipped here from patterns to wire into your own deployment; this scaffold does not provision compute or manage your sessions for you.
 
 ---
 
