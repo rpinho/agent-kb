@@ -77,6 +77,7 @@ agent-kb/
 ├── index.md · log.md · state.md · goals.md
 ├── memory/                MEMORY.md index + one durable fact per file
 ├── docs/agent-operations.md  model routing, private process checks, resource guards, session recovery
+├── docs/model-roles.md       which model for which job, scored from this setup's own outcomes
 ├── raw/                   IMMUTABLE sources (sources/<Author - @handle>/, _index/ = generated metadata)
 ├── wiki/<domain>/         COMPILED knowledge, by topic
 ├── outbox/                deliverables: digests, reports, printable pages
@@ -169,7 +170,7 @@ The next set of lessons came from running several agents, long jobs and phone-co
 - **A session lane has an identity.** Pin its conversation and project directory, start only missing lanes under a lock, and verify phone discovery as well as process health. Test updates against the behavior you need to preserve.
 - **Research starts with prior art; cleanup starts with live references.** Reproduce the public baseline before improving it, and check deployment/configuration references before moving an apparently stale folder to the trash.
 
-See the [operations guide](docs/agent-operations.md) for the decision tables, checks and rollout order. It distinguishes mechanisms already shipped here from patterns to wire into your own deployment; this scaffold does not provision compute or manage your sessions for you.
+See the [operations guide](docs/agent-operations.md) for the decision tables, checks and rollout order. The [model roles leaderboard](docs/model-roles.md) is the concrete counterpart: which model this setup uses for taste, review, mechanical work, building, cheap execution and writing, ranked from its own logged outcomes rather than public benchmarks, with list prices and measured cost per task. The machine-readable contract the harnesses read is [model-roles.json](docs/model-roles.json). It distinguishes mechanisms already shipped here from patterns to wire into your own deployment; this scaffold does not provision compute or manage your sessions for you.
 
 ---
 
