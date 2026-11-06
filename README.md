@@ -1,3 +1,9 @@
+> **Moved to [rpinho/rstack](https://github.com/rpinho/rstack).**
+> This knowledge base now lives there as [`kb/`](https://github.com/rpinho/rstack/tree/main/kb),
+> beside the research harness it is used with and the layer map that ties them together.
+> Its full history came across with it. This repository is archived and read-only; open issues
+> and pull requests against rstack instead.
+
 # agent-kb
 
 **A file-based, agent-maintained knowledge base you run locally.** Clone it, point a coding agent (Claude Code, Codex, ...) at it, and feed it what you read, decide and learn. The agent files each piece into the right place, keeps an index, remembers across sessions, and runs a scheduled digest, because the memory *is* the filesystem, not the model's context window.
